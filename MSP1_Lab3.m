@@ -44,7 +44,7 @@ hold;
 plot(t, y/u0, '-r');
 legend('simulated', 'measured');
 
-% 2b) Anregung durch Fuﬂg‰nger
+% 2b) Anregung durch Fu√üg√§nger
 u0 = -750;
 u_A = 250;
 f = 1.75;
