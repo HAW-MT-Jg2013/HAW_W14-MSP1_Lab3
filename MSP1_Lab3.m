@@ -47,9 +47,13 @@ hold;
 plot(t, y/u0, '-r');
 legend('simulated', 'measured');
 
+<<<<<<< HEAD:MSP_Lab3.m
 % Die Parameter des Systems passen mit ausreichender Genauigkeit.
 
 %% 2b) Anregung durch Fußgänger
+=======
+% 2b) Anregung durch FuÃŸgÃ¤nger
+>>>>>>> FETCH_HEAD:MSP1_Lab3.m
 u0 = -750;
 u_A = 250;
 f = 1.75;
