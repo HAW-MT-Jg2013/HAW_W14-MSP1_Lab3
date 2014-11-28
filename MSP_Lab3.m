@@ -10,6 +10,9 @@ u0 = -750;
 
 plot(t, y);
 grid on;
+title('Sprungantwort Brücke (gemessen mit F = -750 N)');
+xlabel('Zeit (Sekunden)');
+ylabel('Ausschlag (m)');
 
 t1 = 0.29;
 t2 = 0.57;
@@ -33,56 +36,65 @@ mB = 1/(omega_0^2*Kp);
 rB = 2*d/(omega_0*Kp);
 kB = 1/Kp;
 
+% Eigenfrequenz Brücke: omega_0 = 11,28 Hz
 %% Aufgabe 2 - Analyse des Schwingverhaltens
+sys_B = tf(1,[mB rB kB]);
 
-% 2a) Vergleich Theorie - gemessene Werte
-
+%% 2a) Vergleich Theorie - gemessene Werte
 figure;
-sys = tf(1,[mB rB kB]);
-step(sys);
+step(sys_B);
 hold;
 plot(t, y/u0, '-r');
 legend('simulated', 'measured');
 
-% 2b) Anregung durch Fußgänger
+% Die Parameter des Systems passen mit ausreichender Genauigkeit.
+
+%% 2b) Anregung durch Fußgänger
 u0 = -750;
 u_A = 250;
 f = 1.75;
 u = u0 + u_A * sin(2*pi*f*t);
 
-hold off;
-[y t] = lsim(sys, u, t);
+[y_ped t] = lsim(sys_B, u, t);
 figure;
-plot(t, y);
+plot(t, y_ped);
 title('step response pedestrian');
 xlabel('Time (seconds)');
-ylabel('Amplitude');
+ylabel('Amplitude (m)');
 
+% Anregung des Systems mit einem Fußgänger:
 % Einschwingzeit:  ca. 4,5 Sekunden
 % Amplitude:       0,04 m
 
 %% 2c) Amplitudengang
 
-[H, wout] = freqresp(sys);
-H_red = squeeze(H);
-Amp = abs(H_red);
-plot(wout, Amp);
+[H_orig, w_out] = freqresp(sys_B);
+H = squeeze(H_orig);
+Amp = abs(H);
+plot(w_out, Amp);
 
 y_max = 1.643e-4;
 y_stat = Kp;
 
-Res_ueberh = y_max / y_stat;
+ResFaktor = y_max / y_stat;
 
+% Die Resonanzüberhöhung beträgt ca. 5.
 
 %% 3 - Schwingungstilger
 
-% 3c) Test
-dT = 0.1;
+% Parameter der Brücke siehe Aufgabe 1
 
-mT = 25;
-rT = dT; %???
+%% 3c) Test des Tilgers
+close all;
+dT = 0.1;   % in Aufgabe gegeben
+mT = 25;    % in Aufgabe gegeben
+
+kT = mT * omega_0^2;
+rT = 2*dT*kT/omega_0;
+
+%rT = 5; %???
 %rT = (2*dT)/(omega_0);
-kT = omega_0^2 * mT;
+%kT = omega_0^2 * mT;
 
 b2 = mT;
 b1 = rT;
@@ -95,16 +107,48 @@ a0 = kT*kB;
 
 sys_ges = tf([b2 b1 b0],[a4 a3 a2 a1 a0]);
 %bode(sys_ges);
+%figure;
 
-hold;
+% A3c i)
+hold on;
+[H_orig_ges, w_out_ges] = freqresp(sys_ges);
+H_ges = squeeze(H_orig_ges);
+Amp_ges = abs(H_ges);
+plot(w_out_ges, Amp_ges, '-r');     % System mit Tilger
+plot(w_out, Amp);                   % System ohne Tilger
+legend('mit Tilger', 'ohne Tilger');
+grid on;
+hold off;
 
-[H, wout] = freqresp(sys_ges);
-H_red = squeeze(H);
-Amp = abs(H_red);
-plot(wout, Amp, '-r');
+% A3c ii)
+figure;
+pzmap(sys_ges, sys_B);
+legend('mit Tilger', 'ohne Tilger');
+grid on;
 
+% A3c iii)
+figure;
+[y3c_ges,t3c_ges] = step(sys_ges);
+[y3c_B,t3c_B] = step(sys_B);
+plot(t3c_ges, y3c_ges*u0, t3c_B, y3c_B*u0);
+legend('mit Tilger', 'ohne Tilger');
+title('Sprungantwort Brücke (simuliert mit F = -750 N)');
+grid on;
 
+% TODO: Bewegung Tilger relativ zur Brücke
 
-% 3d) eingestellt
+%% 3d) Tilger optimieren
+% Masse mT wird beibehalten, dT und kT optimieren auf eine minimale
+% Resonanzüberhöhung.
+% Wir groß ist die Eigenfrequenz des Schwingungstilgers? TODO
+
+% A3d i)
+% TODO: alle Darstellungen aus A3c
+
+% A3d ii)
+% TODO: Reaktion der Brücke auf den Fußgänger
+%       - Bewegung der Brücke (mit/ ohne Tilger=
+%       - Bewegung des Tilgers relativ zur Brücke
+%       - Wie viel Platz brauch der Tilger?
 
 
