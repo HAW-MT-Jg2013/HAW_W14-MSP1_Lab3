@@ -95,10 +95,6 @@ mT = 25;    % in Aufgabe gegeben
 kT = mT * omega_0^2;
 rT = 2*dT*kT/omega_0;
 
-%rT = 5; %???
-%rT = (2*dT)/(omega_0);
-%kT = omega_0^2 * mT;
-
 b2 = mT;
 b1 = rT;
 b0 = kT;
@@ -109,8 +105,6 @@ a1 = kB*rT + kT*rB;
 a0 = kT*kB;
 
 sys_ges = tf([b2 b1 b0],[a4 a3 a2 a1 a0]);
-%bode(sys_ges);
-%figure;
 
 % A3c i)
 hold on;
@@ -129,29 +123,88 @@ pzmap(sys_ges, sys_B);
 legend('mit Tilger', 'ohne Tilger');
 grid on;
 
-% A3c iii)
+%% A3c iii)
+
+% Sprungantwort Brücke mit/ ohne Tilger
 figure;
-[y3c_ges,t3c_ges] = step(sys_ges);
-[y3c_B,t3c_B] = step(sys_B);
-plot(t3c_ges, y3c_ges*u0, t3c_B, y3c_B*u0);
+[y3c_ges,t3c_ges] = step(sys_ges);  % mit Tilger
+[y3c_B,t3c_B] = step(sys_B);        % ohne Tilger
+plot(t3c_ges, y3c_ges*u0, t3c_B, y3c_B*u0); % skalieren und plotten
 legend('mit Tilger', 'ohne Tilger');
 title('Sprungantwort Brücke (simuliert mit F = -750 N)');
+xlabel('Zeit (Sekunden)');
+ylabel('Amplitude (m)');
 grid on;
 
-% TODO: Bewegung Tilger relativ zur Brücke
+% Bewegung Tilger relativ zur Brücke
+figure;
+sys_T = tf([rT kT], [mT rT kT]);
+[y3c_T,t3c_T] = lsim(sys_T, y3c_ges, t3c_ges);
+y3c_Trel = y3c_ges-y3c_T;
+plot(t3c_T, y3c_Trel*u0);
+xlabel('Zeit (Sekunden)');
+ylabel('Abstand zur Brücke rel. zur Ruhelage (m)');
+title('Sprungantwort Tilger relativ zu Brücke (simuliert mit F = -750 N)');
+grid on;
 
 %% 3d) Tilger optimieren
 % Masse mT wird beibehalten, dT und kT optimieren auf eine minimale
 % Resonanzüberhöhung.
-% Wir groß ist die Eigenfrequenz des Schwingungstilgers? TODO
+% Wir groß ist die Eigenfrequenz des Schwingungstilgers? TODO omega_opt
+
+mT = 25;        % beibehalten
+
+dT_opt = 0.1;           % optimieren
+kT_opt = kT; %start
+
+omega_opt = sqrt(kT_opt / mT);
+rT_opt = 2*dT_opt*kT_opt/omega_opt;
+
+b2 = mT;
+b1 = rT;
+b0 = kT;
+a4 = mT*mB;
+a3 = (mT+mB)*rT + mT*rB;
+a2 = (mT+mB)*kT + mT*kB + rT*rB;
+a1 = kB*rT + kT*rB;
+a0 = kT*kB;
+
+opt_ges = tf([b2 b1 b0],[a4 a3 a2 a1 a0]);
+
+
+
+% Lösungen:
+   % 
+
 
 % A3d i)
-% TODO: alle Darstellungen aus A3c
+% Sprungantwort Brücke mit/ ohne Tilger
+figure;
+[y3d_ges,t3d_ges] = step(opt_ges);  % mit Tilger
+[y3d_B,t3d_B] = step(sys_B);        % ohne Tilger
+plot(t3d_ges, y3d_ges*u0, t3d_B, y3d_B*u0); % skalieren und plotten
+legend('mit Tilger', 'ohne Tilger');
+xlabel('Zeit (Sekunden)');
+ylabel('Amplitude (m)');
+title('Sprungantwort Brücke (simuliert mit F = -750 N)');
+grid on;
+
+% Bewegung Tilger relativ zur Brücke
+figure;
+opt_T = tf([rT kT], [mT rT kT]);
+[y3d_T,t3d_T] = lsim(opt_T, y3d_ges, t3d_ges);
+y3d_Trel = y3d_ges-y3d_T;
+plot(t3d_T, y3d_Trel*u0);
+xlabel('Zeit (Sekunden)');
+ylabel('Abstand zur Brücke rel. zur Ruhelage (m)');
+title('Sprungantwort Tilger relativ zu Brücke (simuliert mit F = -750 N)');
+grid on;
 
 % A3d ii)
 % TODO: Reaktion der Brücke auf den Fußgänger
-%       - Bewegung der Brücke (mit/ ohne Tilger=
+%       - Bewegung der Brücke (mit/ ohne Tilger)
 %       - Bewegung des Tilgers relativ zur Brücke
-%       - Wie viel Platz brauch der Tilger?
+%       - Wie viel Platz braucht der Tilger?
+
 
 
