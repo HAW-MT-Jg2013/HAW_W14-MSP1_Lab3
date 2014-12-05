@@ -87,7 +87,7 @@ ResFaktor = y_max / y_stat;
 
 % Parameter der Brücke siehe Aufgabe 1
 
-%% 3c) Test des Tilgers
+% 3c) Test des Tilgers
 close all;
 dT = 0.1;   % in Aufgabe gegeben
 mT = 25;    % in Aufgabe gegeben
@@ -113,6 +113,9 @@ H_ges = squeeze(H_orig_ges);
 Amp_ges = abs(H_ges);
 plot(w_out_ges, Amp_ges, '-r');     % System mit Tilger
 plot(w_out, Amp);                   % System ohne Tilger
+title('Amplitudengang');
+xlabel('Frequenz omega');
+ylabel('Amplitude (m)');
 legend('mit Tilger', 'ohne Tilger');
 grid on;
 hold off;
@@ -148,33 +151,149 @@ title('Sprungantwort Tilger relativ zu Brücke (simuliert mit F = -750 N)');
 grid on;
 
 %% 3d) Tilger optimieren
-% Masse mT wird beibehalten, dT und kT optimieren auf eine minimale
-% Resonanzüberhöhung.
-% Wir groß ist die Eigenfrequenz des Schwingungstilgers? TODO omega_opt
+% Masse mT wird beibehalten, dT und kT sollen so optimiert werden, 
+% dass eine minimale Resonanzüberhöhung auftritt.
+% Wie groß ist die Eigenfrequenz des Schwingungstilgers? 9.73 Hz
 
-mT = 25;        % beibehalten
+% find optimal values automatically:
+% ----------------------------------
 
-dT_opt = 0.1;           % optimieren
-kT_opt = kT; %start
+% some intial values:
+Res_last = 100;
+w_test = 5:0.1:25;
+mT = 25;                % given value
+dT_s = 0.1;             % start value
 
-omega_opt = sqrt(kT_opt / mT);
-rT_opt = 2*dT_opt*kT_opt/omega_opt;
+% optimize kT
+for kT_s = 2200:0.1:2500  % Bereich zum Finden der opt. Frequ.
+
+    omega_s = sqrt(kT_s / mT);
+    rT_s = 2*dT_s*kT_s/omega_s;
+
+    b2 = mT;
+    b1 = rT_s;
+    b0 = kT_s;
+    a4 = mT*mB;
+    a3 = (mT+mB)*rT_s + mT*rB;
+    a2 = (mT+mB)*kT_s + mT*kB + rT_s*rB;
+    a1 = kB*rT_s + kT_s*rB;
+    a0 = kT_s*kB;
+
+    opt_ges = tf([b2 b1 b0],[a4 a3 a2 a1 a0]);
+
+    % Resonanzüberhöhung automatisch bestimmen:
+    [H_o, w_o] = freqresp(opt_ges, w_test);
+    H_o_x = squeeze(H_o);
+    Amp_o = abs(H_o_x);
+
+    y_max_o = max(Amp_o);
+    y_step = step(opt_ges);
+    y_stat_o = y_step(end);
+
+    Res = y_max_o / y_stat_o;
+
+    % do another round while Res is still decreasing
+    % save last optimal values for output
+    if Res > Res_last
+        break;
+    else      
+        Res_last = Res;
+        kT_opt = kT_s;
+        rT_opt = rT_s;
+        omega_opt = omega_s;
+    end
+end
+
+
+% some intial values:
+Res_last = 100;
+w_test = 5:0.1:20;
+
+% optimize dT
+for dT_s = 0.1:0.001:1     % Bereich zum Finden der opt. Dämpfung
+    
+    rT_s = 2*dT_s*kT_opt/omega_opt;
+
+    b2 = mT;
+    b1 = rT_s;
+    b0 = kT_opt;
+    a4 = mT*mB;
+    a3 = (mT+mB)*rT_s + mT*rB;
+    a2 = (mT+mB)*kT_opt + mT*kB + rT_s*rB;
+    a1 = kB*rT_s + kT_opt*rB;
+    a0 = kT_opt*kB;
+
+    opt_ges = tf([b2 b1 b0],[a4 a3 a2 a1 a0]);
+
+    % Resonanzüberhöhung automatisch bestimmen:
+    [H_o, w_o] = freqresp(opt_ges, w_test);
+    H_o_x = squeeze(H_o);
+    Amp_o = abs(H_o_x);
+
+    y_max_o = max(Amp_o);
+    y_step = step(opt_ges);
+    y_stat_o = y_step(end);
+
+    Res = y_max_o / y_stat_o;
+
+    % do another round while Res is still decreasing
+    % save last optimal values for output
+    if Res > (Res_last+0.01)
+        break;
+    else      
+        Res_last = Res;
+        rT_opt = rT_s;
+        dT_opt = omega_opt*rT_opt/(kT_opt*2);
+    end
+     
+end
+
+% recalculate system with optimal values:
+% ---------------------------------------
+
+% for manual selection:
+%dT_s = 0.2;
+%rT_opt = 2*dT_s*kT_opt/omega_opt;
 
 b2 = mT;
-b1 = rT;
-b0 = kT;
+b1 = rT_opt;
+b0 = kT_opt;
 a4 = mT*mB;
-a3 = (mT+mB)*rT + mT*rB;
-a2 = (mT+mB)*kT + mT*kB + rT*rB;
-a1 = kB*rT + kT*rB;
-a0 = kT*kB;
+a3 = (mT+mB)*rT_opt + mT*rB;
+a2 = (mT+mB)*kT_opt + mT*kB + rT_opt*rB;
+a1 = kB*rT_opt + kT_opt*rB;
+a0 = kT_opt*kB;
 
 opt_ges = tf([b2 b1 b0],[a4 a3 a2 a1 a0]);
 
+% Resonanzüberhöhung automatisch bestimmen:
+[H_o, w_o] = freqresp(opt_ges);
+H_o_x = squeeze(H_o);
+Amp_o = abs(H_o_x);
+
+y_max_o = max(Amp_o);
+y_step = step(opt_ges);
+y_stat_o = y_step(end);
+
+Res = y_max_o / y_stat_o;
+
+plot(w_o, Amp_o);
+title('Amplitudengang');
+xlabel('Frequenz omega');
+ylabel('Amplitude (m)');
+ylim([0 1.4e-4]);
+grid on;
 
 
-% Lösungen:
-   % 
+
+
+
+%% Lösungen:
+omega_opt
+kT_opt
+rT_opt
+dT_opt
+
 
 
 % A3d i)
@@ -191,7 +310,7 @@ grid on;
 
 % Bewegung Tilger relativ zur Brücke
 figure;
-opt_T = tf([rT kT], [mT rT kT]);
+opt_T = tf([rT_opt kT_opt], [mT rT_opt kT_opt]);
 [y3d_T,t3d_T] = lsim(opt_T, y3d_ges, t3d_ges);
 y3d_Trel = y3d_ges-y3d_T;
 plot(t3d_T, y3d_Trel*u0);
