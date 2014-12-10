@@ -1,4 +1,4 @@
-%% MSP1 Labortermin 2 - 05.11.2014
+%% MSP1 Labortermin 3 und 4 - TODO: DATUM
 
 %% Aufgabe 1 - Systemidentifikation
 % y(t) ist Springantowrt auf u(t) = u0 * sigma(t)
@@ -58,7 +58,7 @@ u = u0 + u_A * sin(2*pi*f*t);
 [y_ped t] = lsim(sys_B, u, t);
 figure;
 plot(t, y_ped);
-title('step response pedestrian');
+title('Anregung durch Fußgänger');
 xlabel('Time (seconds)');
 ylabel('Amplitude (m)');
 
@@ -252,7 +252,7 @@ end
 % ---------------------------------------
 
 % for manual selection:
-%dT_s = 0.2;
+%dT_s = 0.188;
 %rT_opt = 2*dT_s*kT_opt/omega_opt;
 
 b2 = mT;
@@ -285,18 +285,15 @@ ylim([0 1.4e-4]);
 grid on;
 
 
-
-
-
-%% Lösungen:
+% Lösungen:
 omega_opt
 kT_opt
 rT_opt
 dT_opt
 
+% TODO: publish values
 
-
-% A3d i)
+%% A3d i)
 % Sprungantwort Brücke mit/ ohne Tilger
 figure;
 [y3d_ges,t3d_ges] = step(opt_ges);  % mit Tilger
@@ -319,11 +316,45 @@ ylabel('Abstand zur Brücke rel. zur Ruhelage (m)');
 title('Sprungantwort Tilger relativ zu Brücke (simuliert mit F = -750 N)');
 grid on;
 
-% A3d ii)
-% TODO: Reaktion der Brücke auf den Fußgänger
-%       - Bewegung der Brücke (mit/ ohne Tilger)
-%       - Bewegung des Tilgers relativ zur Brücke
-%       - Wie viel Platz braucht der Tilger?
+%% A3d ii)
+% Reaktion der Brücke auf den Fußgänger
+% - Bewegung der Brücke (mit/ ohne Tilger)
+% - Bewegung des Tilgers relativ zur Brücke
+% - Wie viel Platz braucht der Tilger?
+
+% Anregung durch Fußgänger:
+u0 = -750;
+u_A = 250;
+f = 1.75;
+u = u0 + u_A * sin(2*pi*f*t);
+
+% Amplitude
+figure;
+[y_ped t] = lsim(sys_B, u, t);
+[y_ped_opt t] = lsim(opt_ges, u, t);
+plot(t, y_ped, t, y_ped_opt);
+title('Anregung durch Fußgänger');
+xlabel('Time (seconds)');
+ylabel('Amplitude (m)');
+legend('ohne Tilger', 'mit optimiertem Tilger');
+
+% Tilger relativ zu Brücke
+figure;
+opt_T = tf([rT_opt kT_opt], [mT rT_opt kT_opt]);  % optimierter Tilger
+[y_ped_opt t] = lsim(opt_ges, u, t);              % Brücke+Tilger
+[y3d_T t3d_T] = lsim(opt_T, y_ped_opt, t);  % Tilger: u := Brücke
+
+y3d_Trel = y_ped_opt-y3d_T;
+plot(t3d_T, y3d_Trel);
+xlabel('Zeit (Sekunden)');
+ylabel('Abstand zur Brücke rel. zur Ruhelage (m)');
+title('Bewegung Tilger relativ zu Brücke (simuliert mit Fußgänger)');
+grid on;
 
 
+% Platz für Tilger
+t_min = min(y3d_Trel);
+t_max = max(y3d_Trel);
+
+% Der Tilger benötigt einen Mindestabstand von ca. 5,5 cm zur Brücke.
 
