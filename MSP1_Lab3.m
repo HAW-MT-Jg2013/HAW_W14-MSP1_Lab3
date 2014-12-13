@@ -286,12 +286,10 @@ grid on;
 
 
 % Lösungen:
-omega_opt
-kT_opt
-rT_opt
-dT_opt
-
-% TODO: publish values
+% omega_opt = 9.7334
+% kT_opt = 2.3685e+03
+% rT_opt = 87.6010
+% dT_opt = 0.1800
 
 %% A3d i)
 % Sprungantwort Brücke mit/ ohne Tilger
