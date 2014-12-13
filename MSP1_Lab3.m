@@ -1,4 +1,4 @@
-%% MSP1 Labortermin 3 und 4 - TODO: DATUM
+%% MSP1 Labortermin 3 und 4 - 14.12.2014
 
 %% Aufgabe 1 - Systemidentifikation
 % y(t) ist Springantowrt auf u(t) = u0 * sigma(t)
@@ -10,7 +10,7 @@ u0 = -750;
 
 plot(t, y);
 grid on;
-title('Sprungantwort Brücke (gemessen mit F = -750 N)');
+title('Sprungantwort BrÃ¼cke (gemessen mit F = -750 N)');
 xlabel('Zeit (Sekunden)');
 ylabel('Ausschlag (m)');
 
@@ -36,7 +36,7 @@ mB = 1/(omega_0^2*Kp);
 rB = 2*d/(omega_0*Kp);
 kB = 1/Kp;
 
-% Eigenfrequenz Brücke: omega_0 = 11,28 Hz
+% Eigenfrequenz der BrÃ¼cke: omega_0 = 11,28 Hz
 %% Aufgabe 2 - Analyse des Schwingverhaltens
 sys_B = tf(1,[mB rB kB]);
 
@@ -49,7 +49,7 @@ legend('simulated', 'measured');
 
 % Die Parameter des Systems passen mit ausreichender Genauigkeit.
 
-%% 2b) Anregung durch Fußgänger
+%% 2b) Anregung durch FuÃŸgÃ¤nger
 u0 = -750;
 u_A = 250;
 f = 1.75;
@@ -58,11 +58,11 @@ u = u0 + u_A * sin(2*pi*f*t);
 [y_ped t] = lsim(sys_B, u, t);
 figure;
 plot(t, y_ped);
-title('Anregung durch Fußgänger');
+title('Anregung durch FuÃŸgÃ¤nger');
 xlabel('Time (seconds)');
 ylabel('Amplitude (m)');
 
-% Anregung des Systems mit einem Fußgänger:
+% Anregung des Systems mit einem FuÃŸgÃ¤nger:
 % Einschwingzeit:  ca. 4,5 Sekunden
 % Amplitude:       0,04 m
 
@@ -81,11 +81,11 @@ y_stat = Kp;
 
 ResFaktor = y_max / y_stat;
 
-% Die Resonanzüberhöhung beträgt ca. 5.
+% Die ResonanzÃ¼berhÃ¶hung betrÃ¤gt ca. 5.
 
 %% 3 - Schwingungstilger
 
-% Parameter der Brücke siehe Aufgabe 1
+% Parameter der BrÃ¼cke siehe Aufgabe 1
 
 % 3c) Test des Tilgers
 close all;
@@ -128,44 +128,44 @@ grid on;
 
 %% A3c iii)
 
-% Sprungantwort Brücke mit/ ohne Tilger
+% Sprungantwort BrÃ¼cke mit/ ohne Tilger
 figure;
 [y3c_ges,t3c_ges] = step(sys_ges);  % mit Tilger
 [y3c_B,t3c_B] = step(sys_B);        % ohne Tilger
 plot(t3c_ges, y3c_ges*u0, t3c_B, y3c_B*u0); % skalieren und plotten
 legend('mit Tilger', 'ohne Tilger');
-title('Sprungantwort Brücke (simuliert mit F = -750 N)');
+title('Sprungantwort BrÃ¼cke (simuliert mit F = -750 N)');
 xlabel('Zeit (Sekunden)');
 ylabel('Amplitude (m)');
 grid on;
 
-% Bewegung Tilger relativ zur Brücke
+% Bewegung Tilger relativ zur BrÃ¼cke
 figure;
 sys_T = tf([rT kT], [mT rT kT]);
 [y3c_T,t3c_T] = lsim(sys_T, y3c_ges, t3c_ges);
 y3c_Trel = y3c_ges-y3c_T;
 plot(t3c_T, y3c_Trel*u0);
 xlabel('Zeit (Sekunden)');
-ylabel('Abstand zur Brücke rel. zur Ruhelage (m)');
-title('Sprungantwort Tilger relativ zu Brücke (simuliert mit F = -750 N)');
+ylabel('Abstand zur BrÃ¼cke rel. zur Ruhelage (m)');
+title('Sprungantwort Tilger relativ zu BrÃ¼cke (simuliert mit F = -750 N)');
 grid on;
 
 %% 3d) Tilger optimieren
 % Masse mT wird beibehalten, dT und kT sollen so optimiert werden, 
-% dass eine minimale Resonanzüberhöhung auftritt.
-% Wie groß ist die Eigenfrequenz des Schwingungstilgers? 9.73 Hz
+% dass eine minimale ResonanzÃ¼berhÃ¶hung auftritt.
+% Wie groÃŸ ist die Eigenfrequenz des Schwingungstilgers? 9.73 Hz
 
-% find optimal values automatically:
+% automatisches Finden der Parameter:
 % ----------------------------------
 
-% some intial values:
+% Werte initialisieren:
 Res_last = 100;
 w_test = 5:0.1:25;
-mT = 25;                % given value
-dT_s = 0.1;             % start value
+mT = 25;                % gegebener Wert
+dT_s = 0.1;             % Startwert
 
-% optimize kT
-for kT_s = 2200:0.1:2500  % Bereich zum Finden der opt. Frequ.
+% kT optimieren:
+for kT_s = 2200:0.1:2500  % Bereich zum Finden der optimalen Frequenz
 
     omega_s = sqrt(kT_s / mT);
     rT_s = 2*dT_s*kT_s/omega_s;
@@ -181,7 +181,7 @@ for kT_s = 2200:0.1:2500  % Bereich zum Finden der opt. Frequ.
 
     opt_ges = tf([b2 b1 b0],[a4 a3 a2 a1 a0]);
 
-    % Resonanzüberhöhung automatisch bestimmen:
+    % ResonanzÃ¼berhÃ¶hung automatisch bestimmen:
     [H_o, w_o] = freqresp(opt_ges, w_test);
     H_o_x = squeeze(H_o);
     Amp_o = abs(H_o_x);
@@ -192,8 +192,8 @@ for kT_s = 2200:0.1:2500  % Bereich zum Finden der opt. Frequ.
 
     Res = y_max_o / y_stat_o;
 
-    % do another round while Res is still decreasing
-    % save last optimal values for output
+    % Erneut durchfÃ¼hren wÃ¤hrend Res sich nach wie vor vermindert
+    % den letzten optimalen Wert fÃ¼r Ausgabe sichern
     if Res > Res_last
         break;
     else      
@@ -205,12 +205,12 @@ for kT_s = 2200:0.1:2500  % Bereich zum Finden der opt. Frequ.
 end
 
 
-% some intial values:
+% Werte initialisieren:
 Res_last = 100;
 w_test = 5:0.1:20;
 
-% optimize dT
-for dT_s = 0.1:0.001:1     % Bereich zum Finden der opt. Dämpfung
+% dT optimieren
+for dT_s = 0.1:0.001:1     % Bereich zum Finden der optimalen DÃ¤mpfung
     
     rT_s = 2*dT_s*kT_opt/omega_opt;
 
@@ -225,7 +225,7 @@ for dT_s = 0.1:0.001:1     % Bereich zum Finden der opt. Dämpfung
 
     opt_ges = tf([b2 b1 b0],[a4 a3 a2 a1 a0]);
 
-    % Resonanzüberhöhung automatisch bestimmen:
+    % ResonanzÃ¼berhÃ¶hung automatisch bestimmen:
     [H_o, w_o] = freqresp(opt_ges, w_test);
     H_o_x = squeeze(H_o);
     Amp_o = abs(H_o_x);
@@ -236,8 +236,8 @@ for dT_s = 0.1:0.001:1     % Bereich zum Finden der opt. Dämpfung
 
     Res = y_max_o / y_stat_o;
 
-    % do another round while Res is still decreasing
-    % save last optimal values for output
+    % Erneut durchfÃ¼hren wÃ¤hrend Res sich nach wie vor vermindert
+    % den letzten optimalen Wert fÃ¼r Ausgabe sichern
     if Res > (Res_last+0.01)
         break;
     else      
@@ -248,12 +248,12 @@ for dT_s = 0.1:0.001:1     % Bereich zum Finden der opt. Dämpfung
      
 end
 
-% recalculate system with optimal values:
+% System neuberechnen mit optimierten Werten:
 % ---------------------------------------
 
-% for manual selection:
-%dT_s = 0.188;
-%rT_opt = 2*dT_s*kT_opt/omega_opt;
+% fÃ¼r manuelle Selektion:
+% dT_s = 0.188;
+% rT_opt = 2*dT_s*kT_opt/omega_opt;
 
 b2 = mT;
 b1 = rT_opt;
@@ -266,7 +266,7 @@ a0 = kT_opt*kB;
 
 opt_ges = tf([b2 b1 b0],[a4 a3 a2 a1 a0]);
 
-% Resonanzüberhöhung automatisch bestimmen:
+% ResonanzÃ¼berhÃ¶hung automatisch bestimmen:
 [H_o, w_o] = freqresp(opt_ges);
 H_o_x = squeeze(H_o);
 Amp_o = abs(H_o_x);
@@ -285,7 +285,7 @@ ylim([0 1.4e-4]);
 grid on;
 
 
-% Lösungen:
+% LÃ¶sungen:
 omega_opt
 kT_opt
 rT_opt
@@ -294,7 +294,7 @@ dT_opt
 % TODO: publish values
 
 %% A3d i)
-% Sprungantwort Brücke mit/ ohne Tilger
+% Sprungantwort BrÃ¼cke mit/ ohne Tilger
 figure;
 [y3d_ges,t3d_ges] = step(opt_ges);  % mit Tilger
 [y3d_B,t3d_B] = step(sys_B);        % ohne Tilger
@@ -302,27 +302,27 @@ plot(t3d_ges, y3d_ges*u0, t3d_B, y3d_B*u0); % skalieren und plotten
 legend('mit Tilger', 'ohne Tilger');
 xlabel('Zeit (Sekunden)');
 ylabel('Amplitude (m)');
-title('Sprungantwort Brücke (simuliert mit F = -750 N)');
+title('Sprungantwort BrÃ¼cke (simuliert mit F = -750 N)');
 grid on;
 
-% Bewegung Tilger relativ zur Brücke
+% Bewegung Tilger relativ zur BrÃ¼cke
 figure;
 opt_T = tf([rT_opt kT_opt], [mT rT_opt kT_opt]);
 [y3d_T,t3d_T] = lsim(opt_T, y3d_ges, t3d_ges);
 y3d_Trel = y3d_ges-y3d_T;
 plot(t3d_T, y3d_Trel*u0);
 xlabel('Zeit (Sekunden)');
-ylabel('Abstand zur Brücke rel. zur Ruhelage (m)');
-title('Sprungantwort Tilger relativ zu Brücke (simuliert mit F = -750 N)');
+ylabel('Abstand zur BrÃ¼cke rel. zur Ruhelage (m)');
+title('Sprungantwort Tilger relativ zu BrÃ¼cke (simuliert mit F = -750 N)');
 grid on;
 
 %% A3d ii)
-% Reaktion der Brücke auf den Fußgänger
-% - Bewegung der Brücke (mit/ ohne Tilger)
-% - Bewegung des Tilgers relativ zur Brücke
+% Reaktion der BrÃ¼cke auf den FuÃŸgÃ¤nger
+% - Bewegung der BrÃ¼cke (mit/ ohne Tilger)
+% - Bewegung des Tilgers relativ zur BrÃ¼cke
 % - Wie viel Platz braucht der Tilger?
 
-% Anregung durch Fußgänger:
+% Anregung durch FuÃŸgÃ¤nger:
 u0 = -750;
 u_A = 250;
 f = 1.75;
@@ -333,28 +333,28 @@ figure;
 [y_ped t] = lsim(sys_B, u, t);
 [y_ped_opt t] = lsim(opt_ges, u, t);
 plot(t, y_ped, t, y_ped_opt);
-title('Anregung durch Fußgänger');
+title('Anregung durch FuÃŸgÃ¤nger');
 xlabel('Time (seconds)');
 ylabel('Amplitude (m)');
 legend('ohne Tilger', 'mit optimiertem Tilger');
 
-% Tilger relativ zu Brücke
+% Tilger relativ zu BrÃ¼cke
 figure;
 opt_T = tf([rT_opt kT_opt], [mT rT_opt kT_opt]);  % optimierter Tilger
-[y_ped_opt t] = lsim(opt_ges, u, t);              % Brücke+Tilger
-[y3d_T t3d_T] = lsim(opt_T, y_ped_opt, t);  % Tilger: u := Brücke
+[y_ped_opt t] = lsim(opt_ges, u, t);              % BrÃ¼cke+Tilger
+[y3d_T t3d_T] = lsim(opt_T, y_ped_opt, t);  % Tilger: u := BrÃ¼cke
 
 y3d_Trel = y_ped_opt-y3d_T;
 plot(t3d_T, y3d_Trel);
 xlabel('Zeit (Sekunden)');
-ylabel('Abstand zur Brücke rel. zur Ruhelage (m)');
-title('Bewegung Tilger relativ zu Brücke (simuliert mit Fußgänger)');
+ylabel('Abstand zur BrÃ¼cke rel. zur Ruhelage (m)');
+title('Bewegung Tilger relativ zu BrÃ¼cke (simuliert mit FuÃŸgÃ¤nger)');
 grid on;
 
 
-% Platz für Tilger
+% Platz fÃ¼r Tilger
 t_min = min(y3d_Trel);
 t_max = max(y3d_Trel);
 
-% Der Tilger benötigt einen Mindestabstand von ca. 5,5 cm zur Brücke.
+% Der Tilger benÃ¶tigt einen Mindestabstand von ca. 5,5 cm zur BrÃ¼cke.
 
